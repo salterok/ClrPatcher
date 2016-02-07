@@ -154,11 +154,16 @@
     <ClInclude Include="bootstrap\dllmain.hpp" />
     <ClInclude Include="bootstrap\regutil.h" />
     <ClInclude Include="bootstrap\regutil.hpp" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="Patcher.h" />
     <ClInclude Include="ProfilerCallback.h" />
+    <ClInclude Include="ProfilerDTOTypes.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ilrewriter.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="Patcher.cpp" />
     <ClCompile Include="ProfilerCallback.cpp" />
     <ClCompile Include="Rejitter.cpp" />
     <ClCompile Include="stdafx.cpp">

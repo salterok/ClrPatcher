@@ -11,7 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ILRewriteProfiler", "CLRPat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D93C15E9-B77F-4D60-B71C-D9FAF18B2B4F}"
 	ProjectSection(SolutionItems) = preProject
-		README.txt = README.txt
+		LICENSE.md = LICENSE.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILRewriteGUI", "CLRPatcher\ILRewriteGUI\ILRewriteGUI.csproj", "{435C6022-7CE0-49A3-93D0-A54CCA05919C}"

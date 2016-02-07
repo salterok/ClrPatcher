@@ -8,6 +8,7 @@
 
 #include "stdafx.h"
 #include "bootstrap/dllmain.hpp"
+#include "Logger.h"
 #include "mscoree.h"
 #include "ProfilerCallback.h"
 #include <fstream>
@@ -28,20 +29,7 @@
 // Maximum buffer size for input from file
 #define BUFSIZE 2048
 
-// String for mscorlib methods or not.
-#define MSCORLIBCOMMAND L"Inserting into mscorlib: %c\r\n"
 
-// Command strings for communicating out-of-process.
-#define CMD_REJITFUNC L"pf"
-#define CMD_REVERTFUNC L"rf"
-#define CMD_QUIT L"qa"
-
-// Response strings for communicating out-of-process.
-#define RSP_REJITSUCCESS L"ps"
-#define RSP_REVERTSUCCESS L"rs"
-#define RSP_REJITFAILURE L"pf"
-#define RSP_REVERTFAILURE L"rf"
-#define RSP_QUITSUCCESS L"qs"
 
 // Make sure the probe type matches the computer's architecture
 #ifdef _WIN64
@@ -68,30 +56,8 @@ IDToInfoMap<ModuleID, ModuleInfo> m_moduleIDToInfoMap;
 BOOL g_bShouldExit = FALSE;
 BOOL g_bSafeToExit = FALSE;
 UINT g_nLastRefid = 0;
-std::wofstream g_wLogFile;
-std::wofstream g_wResultFile;
-BOOL g_fLogFilePathsInitiailized = FALSE;
 
-// I read this file written by GUI to tell me what to do
-WCHAR g_wszCmdFilePath[MAX_PATH] = { L'\0' };
 
-// I write to this file to respond to the GUI
-WCHAR g_wszResponseFilePath[MAX_PATH] = { L'\0' };
-
-// I write additional diagnostic info to this file
-WCHAR g_wszLogFilePath[MAX_PATH] = { L'\0' };
-
-// I write the human-readable profiling results to this (HTML) file
-WCHAR g_wszResultFilePath[MAX_PATH] = { L'\0' };
-
-#define HEX(HR) L"0x" << std::hex << std::uppercase << HR << std::dec
-#define RESULT_APPEND(EXPR) do { g_wResultFile.open(g_wszResultFilePath, std::ios::app); g_wResultFile << L"\n" << EXPR; g_wResultFile.close(); } while(0)
-#define RESPONSE_LITERAL(EXPR) do { std::wofstream ofsLog; ofsLog.open(g_wszResponseFilePath, std::ios::app); ofsLog << EXPR; ofsLog.close(); } while(0)
-#define RESPONSE_APPEND(EXPR) RESPONSE_LITERAL(g_nLastRefid << L">" << EXPR << L"\n")
-#define RESPONSE_IS(REFID, EXPR, MODULE, CLASS, FUNC) RESPONSE_LITERAL(REFID << L">" << EXPR << L"\t" << MODULE << L"\t" << CLASS << L"\t" << FUNC << L"\n")
-#define RESPONSE_ERROR(EXPR) RESPONSE_APPEND(L"ERROR\tError: " << EXPR)
-#define LOG_APPEND(EXPR) do { g_wLogFile.open(g_wszLogFilePath, std::ios::app); g_wLogFile << L"\n" << EXPR; g_wLogFile.close(); } while(0)
-#define LOG_IFFAILEDRET(HR, EXPR) do { if (FAILED(HR)) { LOG_APPEND(EXPR << L", hr = " << HEX(HR)); return HR; } } while(0)
 
 
 // [extern] ilrewriter function for rewriting a module's IL
@@ -111,15 +77,6 @@ extern HRESULT SetILForManagedHelper(
 	mdMethodDef mdHelperToAdd,
 	mdMethodDef mdIntPtrExplicitCast,
 	mdMethodDef mdPInvokeToCall);
-
-// Struct used to hold the arguments for creating the file watcher thread. 
-// Used since threadstart uses a LPVOID parameter for the called function.
-struct threadargs
-{
-	ICorProfilerCallback * m_pCallback;
-	LPCWSTR m_wszpath;
-	IDToInfoMap<ModuleID, ModuleInfo> * m_iMap;
-};
 
 //************************************************************************************************//
 
@@ -2145,6 +2102,7 @@ BOOL ProfilerCallback::ReplaceClass(IDToInfoMap<ModuleID, ModuleInfo> * mMap, LP
 
 		hr = sourceModuleInfo.m_pEmit->SetRVA(source, targetMethodRVA);
 		LOG_IFFAILEDRET(hr, L"ERROR setting source method RVA");
+		
 		LOG_APPEND(L"RVA set successfully");
 		return true;
 	}
