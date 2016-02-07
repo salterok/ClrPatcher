@@ -7,7 +7,7 @@
 #ifndef __PROFILER_CALLBACK_H__
 #define __PROFILER_CALLBACK_H__
 
-#include "basehdr.h"
+#include "bootstrap/basehdr.h"
 #include "mscoree.h"
 #include "stdafx.h"
 #include <corprof.h>
@@ -17,12 +17,12 @@
 #include <map>
 
 extern const GUID __declspec(selectany) CLSID_PROFILER = {
-	0xfa8f1dff, 0xb62, 0x4f84, {0x88, 0x7f, 0xec, 0xac, 0x69, 0xa6, 0x5d, 0xd3}
+	0xf704f0e6, 0x82c4, 0x4bc4,{ 0x9e, 0xd7, 0xa9, 0xe1, 0x46, 0x70, 0xbd, 0xd8 }
 };
 #define THREADING_MODEL "Both"
 #define PROGID_PREFIX "Function Tracing Profiler"
 #define COCLASS_DESCRIPTION "Microsoft IL-Rewriting Profiler"
-#define PROFILER_GUID "{FA8F1DFF-0B62-4F84-887F-ECAC69A65DD3}"
+#define PROFILER_GUID "{F704F0E6-82C4-4BC4-9ED7-A9E14670BDD8}"
 
 #define BUFSIZE 2048
 

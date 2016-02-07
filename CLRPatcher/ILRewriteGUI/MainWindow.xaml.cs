@@ -24,10 +24,12 @@ namespace ILRewriteGUI
 	[PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
 	public partial class MainWindow : Window
 	{
-		#region Strings
+        private const string PROFILER_GUID = "{F704F0E6-82C4-4BC4-9ED7-A9E14670BDD8}";
 
-		// Error messages.
-		private const string INVALIDDATAERRORMESSAGE = "File input does not match expected format.";
+        #region Strings
+
+        // Error messages.
+        private const string INVALIDDATAERRORMESSAGE = "File input does not match expected format.";
 		private const string IOEXCEPTIONRETRYMESSAGE = "File in use. Waiting, then trying again...";
 		private const string IOEXCEPTIONFAILEDMESSAGE = "Error: could not open log.";
 		private const string TIMEOUTRESPONSEMESSAGE = "Error: No response from the native watcher.";
@@ -156,7 +158,7 @@ namespace ILRewriteGUI
 				app.StartInfo.FileName = appPath.Text;
 				app.StartInfo.UseShellExecute = false;
 				app.StartInfo.EnvironmentVariables.Add("COR_ENABLE_PROFILING", "1");
-				app.StartInfo.EnvironmentVariables.Add("COR_PROFILER", "{FA8F1DFF-0B62-4F84-887F-ECAC69A65DD3}");
+				app.StartInfo.EnvironmentVariables.Add("COR_PROFILER", PROFILER_GUID);
 				app.Start();
 			}
 			else

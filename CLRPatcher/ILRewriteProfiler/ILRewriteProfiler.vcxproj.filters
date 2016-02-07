@@ -13,28 +13,31 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\bootstrap">
+      <UniqueIdentifier>{27434619-60b7-4a22-92ca-f1e929ee3d18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="dllmain.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ProfilerCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="basehdr.h">
+    <ClInclude Include="bootstrap\basehdr.h">
+      <Filter>Header Files\bootstrap</Filter>
+    </ClInclude>
+    <ClInclude Include="bootstrap\classfactory.hpp">
+      <Filter>Header Files\bootstrap</Filter>
+    </ClInclude>
+    <ClInclude Include="bootstrap\dllmain.hpp">
+      <Filter>Header Files\bootstrap</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="regutil.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="bootstrap\regutil.hpp">
+      <Filter>Header Files\bootstrap</Filter>
     </ClInclude>
-    <ClInclude Include="regutil.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="classfactory.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="bootstrap\regutil.h">
+      <Filter>Header Files\bootstrap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

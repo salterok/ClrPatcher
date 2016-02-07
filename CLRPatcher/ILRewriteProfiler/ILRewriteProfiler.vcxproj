@@ -149,12 +149,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="basehdr.h" />
-    <ClInclude Include="classfactory.hpp" />
-    <ClInclude Include="dllmain.hpp" />
+    <ClInclude Include="bootstrap\basehdr.h" />
+    <ClInclude Include="bootstrap\classfactory.hpp" />
+    <ClInclude Include="bootstrap\dllmain.hpp" />
+    <ClInclude Include="bootstrap\regutil.h" />
+    <ClInclude Include="bootstrap\regutil.hpp" />
     <ClInclude Include="ProfilerCallback.h" />
-    <ClInclude Include="regutil.h" />
-    <ClInclude Include="regutil.hpp" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

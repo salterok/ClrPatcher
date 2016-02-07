@@ -7,7 +7,7 @@
 //  Implements ICorProfilerCallback. Logs every event of interest to a file on disk.
 
 #include "stdafx.h"
-#include "dllmain.hpp"
+#include "bootstrap/dllmain.hpp"
 #include "mscoree.h"
 #include "ProfilerCallback.h"
 #include <fstream>
