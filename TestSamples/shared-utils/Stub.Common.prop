@@ -1,0 +1,6 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <DefineConstants>$(DefineConstants);STUB_PROJ</DefineConstants>
+        <DefineConstants>$(DefineConstants);NETFX_46,NETFX_45,NETFX_40,NETFX_35,NETFX_30,NETFX_20</DefineConstants>
+    </PropertyGroup>
+</Project>

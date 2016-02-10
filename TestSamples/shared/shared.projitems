@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>43ed6bec-ab2a-4a28-b803-0b0b2b62249c</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BaseInterface.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BaseInterfaceDonorImpl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BaseInterfaceImpl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CaseAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EntryPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestImpl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestTarget.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestVerifier.cs" />
+  </ItemGroup>
+</Project>

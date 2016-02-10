@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CLRPatcher.Test.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="PatcherGUID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">{F704F0E6-82C4-4BC4-9ED7-A9E14670BDD8}</Value>
+    </Setting>
+    <Setting Name="SampleRelativePath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\TestSamples\bin\</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

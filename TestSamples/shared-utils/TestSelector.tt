@@ -1,0 +1,86 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="$(TargetDir)stub.dll" #>
+<#@ assembly name="Microsoft.CSharp" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".g.cs" #>
+
+<# 
+	var interfaces = AppDomain.CurrentDomain.GetAssemblies()
+			.SelectMany(t => t.GetTypes())
+			.Where(t => t.IsInterface && t.Namespace == "shared" 
+				&& t.CustomAttributes.Any(ca => ca.AttributeType.Name == "TestTarget"));
+	var sections = interfaces.Select(@interface =>
+	{
+		var methods = @interface.GetMethods();
+		var targetAttribute = @interface.GetCustomAttributes(typeof(shared.TestTarget), false)
+			.Single() as shared.TestTarget;
+		var attributes = methods.SelectMany(method =>
+			{
+				var attribs = method.GetCustomAttributes(typeof(shared.TestTarget), false).Cast<shared.TestTarget>();
+				foreach (var attrib in attribs)
+				{
+					attrib.MethodName = method.Name;
+				}
+				return attribs;
+			})
+			.OrderBy(x => x.Version)
+			.GroupBy(x => x.OnlyExactVersion)
+			.ToDictionary(x => x.Key, x => x.ToList());
+		var key = new KeyValuePair<string, string>(@interface.Name, targetAttribute.ImplTarget);
+		return new KeyValuePair<KeyValuePair<string, string>, Dictionary<bool, List<shared.TestTarget>>>(key, attributes);
+	});
+#>
+// <#= interfaces.Count() #>
+/*
+        public readonly VersionType Version;
+        public readonly bool OnlyExactVersion;
+        public string MethodName;
+*/
+
+namespace shared
+{
+	using System;
+    internal partial class EntryPoint
+    {
+        private static TestResult DoTest(string name, bool patched)
+        {
+            switch(name)
+            {
+<# foreach(var section in sections) { #>
+		#region <#= section.Key.Key #>
+<#
+		var versions = section.Value[false].GroupBy(x => x.Version);
+		var versionCount = versions.Count();
+		foreach(var versionedTests in versions) { #>
+			#if <#= versionedTests.Key #>
+<#			foreach (var test in versionedTests) { #>
+				case "<#= section.Key.Key #>.<#= test.MethodName #>":
+					return <#= section.Key.Value #>.<#= test.MethodName #>(patched);
+<#			}
+		} 
+		while(versionCount-- > 0) { #>
+			#endif
+<#		} #>
+
+//TODO: only-specific version is not working for now
+// compile-time constants should be prefixed by "CURR_"
+<#		versions = section.Value[true].GroupBy(x => x.Version);
+		foreach(var versionedTests in versions) { #>		
+			#if DISABLED_CURR_<#= versionedTests.Key #>
+<#			foreach (var test in versionedTests) { #>
+				case "<#= test.MethodName #>":
+					return <#= section.Key.Value #>.<#= test.MethodName #>(patched);
+<#			} #>
+			#endif
+<#		} #>
+		#endregion <#= section.Key.Key #>
+<#		} #>
+                default:
+                    throw new ArgumentException("Test " + name + " does not exist", "name");
+            }
+        }
+	}
+}

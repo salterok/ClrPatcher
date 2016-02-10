@@ -1,0 +1,10 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.6' ">$(DefineConstants);CURR_NETFX_46,NETFX_46,NETFX_45,NETFX_40,NETFX_35,NETFX_30,NETFX_20</DefineConstants>
+        <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.5' ">$(DefineConstants);CURR_NETFX_45,NETFX_45,NETFX_40,NETFX_35,NETFX_30,NETFX_20</DefineConstants>
+        <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v4.0' ">$(DefineConstants);CURR_NETFX_40,NETFX_40,NETFX_35,NETFX_30,NETFX_20</DefineConstants>
+        <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.5' ">$(DefineConstants);CURR_NETFX_35,NETFX_35,NETFX_30,NETFX_20</DefineConstants>
+        <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v3.0' ">$(DefineConstants);CURR_NETFX_30,NETFX_30,NETFX_20</DefineConstants>
+        <DefineConstants Condition=" '$(TargetFrameworkVersion)' == 'v2.0' ">$(DefineConstants);CURR_NETFX_20,NETFX_20</DefineConstants>
+    </PropertyGroup>
+</Project>
