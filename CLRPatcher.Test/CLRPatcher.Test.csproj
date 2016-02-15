@@ -62,6 +62,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SampleTestResult.cs" />
+    <Compile Include="SampleTests\Console_45.cs" />
+    <Compile Include="SampleTests\Console_40.cs" />
+    <Compile Include="SampleTests\Console_35.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

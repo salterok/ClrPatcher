@@ -624,15 +624,14 @@ HRESULT ProfilerCallback::ModuleLoadFinished(ModuleID moduleID, HRESULT hrStatus
         }
     }
 
-    if (rgMethodDefs.size() > 0)
-    {
+    if (rgMethodDefs.size() > 0) {
         LOG_APPEND(L"Auto-pre-rejitting " << rgMethodDefs.size() << L"  methods for modules that have just loaded into an AppDomain different from that containing a module from a prior ReJIT request.");
         CallRequestReJIT((UINT) rgMethodDefs.size(), rgModuleIDs.data(), rgMethodDefs.data());
     }
 
 
 #if _DEBUG
-	BOOL repl = ReplaceClass(&m_moduleIDToInfoMap, L"SampleApp.exe", L"SampleApp.Test1", L"SampleApp.Test3");
+	BOOL repl = ReplaceClass(&m_moduleIDToInfoMap, L"console_45.exe", L"shared.BaseInterfaceImpl", L"shared.BaseInterfaceDonorImpl");
 	if (repl) {
 		LOG_APPEND("replacing rva ok");
 	}
@@ -2069,7 +2068,7 @@ BOOL ProfilerCallback::ReplaceClass(IDToInfoMap<ModuleID, ModuleInfo> * mMap, LP
 
 	mdMethodDef source, target;
 	ModuleInfo sourceModuleInfo, targetModuleInfo;
-	LPCWSTR methodName = L"foo";
+	LPCWSTR methodName = L"GetValue";
 
 	BOOL sourceFound = GetMethodsInfoFromNames(
 		mMap,

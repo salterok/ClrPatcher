@@ -10,7 +10,26 @@ namespace CLRPatcher.Test
 {
     public class BaseSamplesTest
     {
-        
+
+
+        private TestContext testContextInstance;
+        /// <summary>
+        ///Gets or sets the test context which provides
+        ///information about and functionality for the current test run.
+        ///</summary>
+        public TestContext TestContext
+        {
+            get
+            {
+                return testContextInstance;
+            }
+            set
+            {
+                testContextInstance = value;
+            }
+        }
+
+
         public string TargetName;
         protected ProcessOutputGetter pog;
 

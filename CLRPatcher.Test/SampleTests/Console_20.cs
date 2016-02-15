@@ -8,6 +8,8 @@ namespace CLRPatcher.Test.SampleTests
     [TestClass]
     public class Console_20 : BaseSamplesTest
     {
+        public Console_20(string targetName) : base(targetName) { }
+
         public Console_20() : base("console_20.exe") { }
 
         [TestMethod]
