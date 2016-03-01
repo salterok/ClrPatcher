@@ -1,2 +1,2 @@
 CD /d "%~dp0"
-regsvr32 Debug\ILRewriteProfiler.dll
+regsvr32 bin\Debug\CLRPatcherCore32.dll

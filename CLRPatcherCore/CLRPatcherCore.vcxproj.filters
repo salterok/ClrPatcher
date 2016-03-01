@@ -70,12 +70,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="F:\CLRProfiler\Sources\profilerOBJ\ProfilerOBJ.vcxproj.filters" />
-    <None Include="ProfilerOBJ.vcxproj.filters" />
     <None Include="sigparse.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include=".\ILRewriteProfiler.def">
+    <None Include=".\CLRPatcherCore.def">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

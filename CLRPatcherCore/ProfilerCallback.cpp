@@ -1,11 +1,3 @@
-// ==++==
-
-//   Copyright (c) Microsoft Corporation.  All rights reserved.
-
-// ==--==
-
-//  Implements ICorProfilerCallback. Logs every event of interest to a file on disk.
-
 #include "stdafx.h"
 #include "bootstrap/dllmain.hpp"
 #include "Logger.h"
@@ -208,6 +200,7 @@ HRESULT ProfilerCallback::CreateObject(REFIID riid, void **ppInterface)
 
 // [public] Creates a new instance of the profiler and zeroes all members
 ProfilerCallback::ProfilerCallback() :
+	m_patcher(NULL),
 	m_pProfilerInfo(NULL),
 	m_fInstrumentationHooksInSeparateAssembly(TRUE),
 	m_mdIntPtrExplicitCast(mdTokenNil),
@@ -240,6 +233,9 @@ ProfilerCallback::ProfilerCallback() :
 // Empty method.
 ProfilerCallback::~ProfilerCallback()
 {
+	if (m_patcher) {
+		delete m_patcher;
+	}
 }
 
 // [public] IUnknown method, increments refcount to keep track of when to call destructor

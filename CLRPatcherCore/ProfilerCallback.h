@@ -9,6 +9,7 @@
 
 #include "bootstrap/basehdr.h"
 #include "ProfilerDTOTypes.h"
+#include "Patcher.h"
 #include "mscoree.h"
 #include "stdafx.h"
 #include <corprof.h>
@@ -219,6 +220,11 @@ public:
 
 
 private:
+	Patcher *m_patcher;
+
+
+
+
 	ICorProfilerInfo4 * m_pProfilerInfo;
 
 	volatile long m_refCount;
