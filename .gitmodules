@@ -1,0 +1,3 @@
+[submodule "CLRPatcherCore/libs/yaml-cpp"]
+	path = CLRPatcherCore/libs/yaml-cpp
+	url = git@github.com:jbeder/yaml-cpp.git
