@@ -11,6 +11,9 @@
 #include <io.h>
 #include <dos.h>
 #include <Windows.h>
+#include "Const.h"
+#include "PatcherSession.h"
+#include "yaml-cpp/yaml.h"
 
 #undef _WIN32_WINNT
 #define _WIN32_WINNT	0x0403
@@ -200,7 +203,6 @@ HRESULT ProfilerCallback::CreateObject(REFIID riid, void **ppInterface)
 
 // [public] Creates a new instance of the profiler and zeroes all members
 ProfilerCallback::ProfilerCallback() :
-	m_patcher(NULL),
 	m_pProfilerInfo(NULL),
 	m_fInstrumentationHooksInSeparateAssembly(TRUE),
 	m_mdIntPtrExplicitCast(mdTokenNil),
@@ -227,6 +229,41 @@ ProfilerCallback::ProfilerCallback() :
 		L"-------------------------------------\n";
 	g_wLogFile.close();
 
+
+
+	try {
+		char buffer[Const::MAX_PATCHER_COMMAND_LENGTH];
+		size_t maxCommandSize = Const::MAX_PATCHER_COMMAND_LENGTH;
+		auto result = getenv_s(&maxCommandSize, buffer, Const::PATCHER_COMMAND);
+		PatcherSession::Session session;
+		if (buffer) {
+			session = PatcherSession::ParseFromString(buffer);
+			m_isInitialized = true;
+		}
+		else {
+			maxCommandSize = MAX_PATH;
+			result = getenv_s(&maxCommandSize, buffer, Const::PATCHER_COMMAND_FILEPATH);
+			if (buffer) {
+				std::string file(buffer, maxCommandSize);
+				session = PatcherSession::ParseFromFile(file);
+				m_isInitialized = true;
+			}
+			// m_isInitialized stay false
+		}
+		if (m_isInitialized) {
+			m_patcher = new Patcher(session);
+		}
+	}
+	catch (YAML::Exception ex) {
+		m_isInitialized = false;
+	}
+	catch (std::exception ex) {
+		m_isInitialized = false;
+		// TODO: add logs
+	}
+
+
+	
 	g_pCallbackObject = this;
 }
 

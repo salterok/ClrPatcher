@@ -4,11 +4,12 @@
 #include "Patcher.h"
 #include "Logger.h"
 
+using namespace PatcherSession;
 
-Patcher::Patcher()
+Patcher::Patcher(Session session)
 {
+	m_session = session;
 }
-
 
 Patcher::~Patcher()
 {

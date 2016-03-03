@@ -220,6 +220,8 @@ public:
 
 
 private:
+	bool m_isInitialized = false;
+
 	Patcher *m_patcher;
 
 
