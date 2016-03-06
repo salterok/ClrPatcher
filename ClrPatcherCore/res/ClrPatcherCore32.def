@@ -1,0 +1,7 @@
+LIBRARY ClrPatcherCore32
+EXPORTS
+    DllGetClassObject private
+    DllRegisterServer private        
+    DllUnregisterServer private
+	NtvEnteredFunction
+	NtvExitedFunction

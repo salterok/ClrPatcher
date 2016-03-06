@@ -62,7 +62,10 @@
     <None Include="src\sigparse.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="res\ClrPatcherCore.def">
+    <None Include="res\ClrPatcherCore32.def">
+      <Filter>Resource Files</Filter>
+    </None>
+	<None Include="res\ClrPatcherCore64.def">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
