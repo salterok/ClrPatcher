@@ -29,12 +29,12 @@
     <ClInclude Include="src\Patcher.h" />
     <ClInclude Include="src\PatcherSession.h" />
     <ClInclude Include="src\ProfilerCallback.h" />
-    <ClInclude Include="src\ProfilerDTOTypes.h" />
+    <ClInclude Include="src\ProfilerDtoTypes.h" />
     <ClInclude Include="src\SessionTypes.h" />
     <ClInclude Include="src\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\CLRPatcherCore.def" />
+    <None Include="res\ClrPatcherCore.def" />
     <None Include="src\sigparse.inl" />
   </ItemGroup>
   <ItemGroup>
@@ -53,8 +53,8 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{99C3302B-9DC2-48FB-A351-B64EACA66DE9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-	<IncludePath>libs\__include;$(IncludePath)</IncludePath>
-    <LibraryPath>libs\__lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\Projects\Hack\ClrPatcher\ClrPatcherCore\libs\__include;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\Projects\Hack\ClrPatcher\ClrPatcherCore\libs\__lib;$(LibraryPath)</LibraryPath>
     <RootNamespace>ClrPatcherCore</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>

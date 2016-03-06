@@ -1,6 +1,7 @@
 # Custom
 *.snk
-libs
+libs/__include
+libs/__lib
 
 
 
