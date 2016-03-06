@@ -10,6 +10,7 @@ namespace PatcherSession {
 	enum DocType
 	{
 		UNKNOWN,
+		OPTIONS,
 		COMMANDS
 	};
 
@@ -18,6 +19,8 @@ namespace PatcherSession {
 
 	};
 
-	Session ParseFromString(char *commands);
-	Session ParseFromFile(const std::string commandsFile);
+
+	bool tryLoadSession(Session *session);
+	Session parseFromString(char *commands);
+	Session parseFromFile(const std::string commandsFile);
 };

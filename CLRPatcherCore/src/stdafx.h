@@ -22,3 +22,7 @@
 #include "corprof.h"
 #include "mscoree.h"
 #include "corprof.h"
+
+// local
+#include "Const.h"
+#include "Logger.h"

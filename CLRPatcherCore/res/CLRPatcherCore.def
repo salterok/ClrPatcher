@@ -3,7 +3,7 @@
 ;   Copyright (c) Microsoft Corporation.  All rights reserved.
 ; 
 ; ==--==
-LIBRARY ILRewriteProfiler
+LIBRARY ClrPatcherCore
 EXPORTS
     DllGetClassObject private
     DllRegisterServer private        

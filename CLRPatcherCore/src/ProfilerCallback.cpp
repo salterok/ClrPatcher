@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "bootstrap/dllmain.hpp"
-#include "Logger.h"
 #include "mscoree.h"
 #include "ProfilerCallback.h"
 #include <fstream>
@@ -11,9 +10,7 @@
 #include <io.h>
 #include <dos.h>
 #include <Windows.h>
-#include "Const.h"
 #include "PatcherSession.h"
-#include "yaml-cpp/yaml.h"
 
 #undef _WIN32_WINNT
 #define _WIN32_WINNT	0x0403
@@ -229,39 +226,16 @@ ProfilerCallback::ProfilerCallback() :
 		L"-------------------------------------\n";
 	g_wLogFile.close();
 
+	LOG_APPEND("BEFORE YAML");
 
+	PatcherSession::Session session;
+	m_isInitialized = PatcherSession::tryLoadSession(&session);
 
-	try {
-		char buffer[Const::MAX_PATCHER_COMMAND_LENGTH];
-		size_t maxCommandSize = Const::MAX_PATCHER_COMMAND_LENGTH;
-		auto result = getenv_s(&maxCommandSize, buffer, Const::PATCHER_COMMAND);
-		PatcherSession::Session session;
-		if (buffer) {
-			session = PatcherSession::ParseFromString(buffer);
-			m_isInitialized = true;
-		}
-		else {
-			maxCommandSize = MAX_PATH;
-			result = getenv_s(&maxCommandSize, buffer, Const::PATCHER_COMMAND_FILEPATH);
-			if (buffer) {
-				std::string file(buffer, maxCommandSize);
-				session = PatcherSession::ParseFromFile(file);
-				m_isInitialized = true;
-			}
-			// m_isInitialized stay false
-		}
-		if (m_isInitialized) {
-			m_patcher = new Patcher(session);
-		}
-	}
-	catch (YAML::Exception ex) {
-		m_isInitialized = false;
-	}
-	catch (std::exception ex) {
-		m_isInitialized = false;
-		// TODO: add logs
+	if (m_isInitialized) {
+		m_patcher = new Patcher(session);
 	}
 
+	LOG_APPEND("AFTER YAML");
 
 	
 	g_pCallbackObject = this;
@@ -663,7 +637,7 @@ HRESULT ProfilerCallback::ModuleLoadFinished(ModuleID moduleID, HRESULT hrStatus
     }
 
 
-#if _DEBUG
+
 	BOOL repl = ReplaceClass(&m_moduleIDToInfoMap, L"console_45.exe", L"shared.BaseInterfaceImpl", L"shared.BaseInterfaceDonorImpl");
 	if (repl) {
 		LOG_APPEND("replacing rva ok");
@@ -671,7 +645,6 @@ HRESULT ProfilerCallback::ModuleLoadFinished(ModuleID moduleID, HRESULT hrStatus
 	else {
 		LOG_APPEND("replacing rva fail");
 	}
-#endif
 
     return S_OK;
 }
