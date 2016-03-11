@@ -1,21 +1,18 @@
 #pragma once
 #include "ProfilerDTOTypes.h"
 #include "PatcherSession.h"
-
-class Patcher
-{
-public:
-	Patcher(PatcherSession::Session session);
-	~Patcher();
+#include "PatcherApi.h"
 
 
-	/* Replace source method RVA with target method RVA
-	* Only works for pure method or if method access accessible base(NOT overrided) members
-	*/
-	HRESULT ReplaceMethodRVA(const ModuleInfo &sourceModuleInfo, const mdMethodDef &source, const mdMethodDef &target);
+namespace PatcherCore {
+	class Patcher
+	{
+	public:
+		Patcher(Session session);
+		~Patcher();
 
-private:
-	PatcherSession::Session m_session;
+	private:
+		Session m_session;
 
-};
-
+	};
+}

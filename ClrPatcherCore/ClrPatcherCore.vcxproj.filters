@@ -13,7 +13,7 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="PatcherSession">
+    <Filter Include="PatcherCore">
       <UniqueIdentifier>{15c489b5-c2ee-4902-b74d-a53b6f7044bf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -28,9 +28,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Patcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ProfilerCallback.h">
@@ -52,10 +49,19 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\SessionTypes.h">
-      <Filter>PatcherSession</Filter>
+      <Filter>PatcherCore</Filter>
     </ClInclude>
     <ClInclude Include="src\PatcherSession.h">
-      <Filter>PatcherSession</Filter>
+      <Filter>PatcherCore</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SessionBinder.h">
+      <Filter>PatcherCore</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PatcherApi.h">
+      <Filter>PatcherCore</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patcher.h">
+      <Filter>PatcherCore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -65,7 +71,7 @@
     <None Include="res\ClrPatcherCore32.def">
       <Filter>Resource Files</Filter>
     </None>
-	<None Include="res\ClrPatcherCore64.def">
+    <None Include="res\ClrPatcherCore64.def">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -74,9 +80,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Patcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ProfilerCallback.cpp">
@@ -89,10 +92,19 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SessionTypes.cpp">
-      <Filter>PatcherSession</Filter>
+      <Filter>PatcherCore</Filter>
     </ClCompile>
     <ClCompile Include="src\PatcherSession.cpp">
-      <Filter>PatcherSession</Filter>
+      <Filter>PatcherCore</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionBinder.cpp">
+      <Filter>PatcherCore</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PatcherApi.cpp">
+      <Filter>PatcherCore</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Patcher.cpp">
+      <Filter>PatcherCore</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

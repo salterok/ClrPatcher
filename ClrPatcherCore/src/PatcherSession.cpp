@@ -1,66 +1,45 @@
 #include "stdafx.h"
 #include "PatcherSession.h"
 #include "yaml-cpp/yaml.h"
+#include "SessionBinder.h"
 
 
 using namespace std;
 using namespace YAML;
 using namespace Const::CommandSyntax;
 
-namespace PatcherSession {
-
-	DocType _documentType(const string &type) {
-		if (type == DOC_TYPE_COMMANDS)
-			return DocType::COMMANDS;
-
-		return DocType::UNKNOWN;
-	}
-
+namespace PatcherCore {
 
 	Session _parse(std::vector<Node> &docs)
 	{
 		Session session;
 		LOG_APPEND("Documents found: " << docs.size());
+		LOG_APPEND("NOTICE: Support only one document(first) for now");
 
-		for(auto doc : docs)
-		{
-			LOG_APPEND("_parse " << doc["doc_type"].as<string>().c_str());
-			if (!doc.IsMap())
-				throw new exception("Patcher commands should contain only documents of map");
-			auto docType = doc[DOC_TYPE_EL];
-			if (docType.IsDefined() && docType.IsScalar()) {
-				DocType type = _documentType(docType.Scalar());
-				switch (type)
-				{
-				case COMMANDS:
-					LOG_APPEND("COMMAND section in YAML found");
-					break;
-				case UNKNOWN:
-				default:
-					break;
-				}
-			}
-			else
-				throw new exception("doo");
-		}
+		auto doc = docs[0];
 
-		return session;
+		if (!doc.IsMap())
+			throw new exception("Patcher commands should contain only documents of map");
+
+		return doc.as<Session>();
+
+		//return Session();
 	}
 
-	Session _parseFromString(char * commands)
+	Session parseFromString(char *commands)
 	{
 		auto docs = YAML::LoadAll(commands);
 		return _parse(docs);
 	}
 
-	Session _parseFromFile(const std::string commandsFile)
+	Session parseFromFile(const std::string commandsFile)
 	{
 		LOG_APPEND("Reading session from file: " << commandsFile.c_str());
 		auto docs = YAML::LoadAllFromFile(commandsFile);
 		return _parse(docs);
 	}
 
-	bool tryLoadSession(Session * session)
+	bool tryLoadSession(Session *session)
 	{
 		try {
 			char buffer[Const::MAX_PATCHER_COMMAND_LENGTH];

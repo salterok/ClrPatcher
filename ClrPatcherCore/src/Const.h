@@ -8,8 +8,8 @@ namespace Const {
 
 
 	namespace CommandSyntax {
-		static const char *DOC_TYPE_EL = "doc_type";
-		static const char *DOC_TYPE_COMMANDS = "commands";
+		static const char *SECTION_TYPE_OPTIONS = "options";
+		static const char *SECTION_TYPE_COMMANDS = "commands";
 	}
 }
 

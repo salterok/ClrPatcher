@@ -27,9 +27,11 @@
     <ClInclude Include="src\Const.h" />
     <ClInclude Include="src\Logger.h" />
     <ClInclude Include="src\Patcher.h" />
+    <ClInclude Include="src\PatcherApi.h" />
     <ClInclude Include="src\PatcherSession.h" />
     <ClInclude Include="src\ProfilerCallback.h" />
     <ClInclude Include="src\ProfilerDtoTypes.h" />
+    <ClInclude Include="src\SessionBinder.h" />
     <ClInclude Include="src\SessionTypes.h" />
     <ClInclude Include="src\stdafx.h" />
   </ItemGroup>
@@ -42,9 +44,11 @@
     <ClCompile Include="src\ilrewriter.cpp" />
     <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\Patcher.cpp" />
+    <ClCompile Include="src\PatcherApi.cpp" />
     <ClCompile Include="src\PatcherSession.cpp" />
     <ClCompile Include="src\ProfilerCallback.cpp" />
     <ClCompile Include="src\Rejitter.cpp" />
+    <ClCompile Include="src\SessionBinder.cpp" />
     <ClCompile Include="src\SessionTypes.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -99,7 +103,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ClrPatcherCore</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-	<IncludePath>libs\__include;$(IncludePath)</IncludePath>
+    <IncludePath>libs\__include;$(IncludePath)</IncludePath>
     <LibraryPath>libs\__lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
   </PropertyGroup>

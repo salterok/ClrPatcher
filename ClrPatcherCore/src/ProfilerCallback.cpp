@@ -228,11 +228,11 @@ ProfilerCallback::ProfilerCallback() :
 
 	LOG_APPEND("BEFORE YAML");
 
-	PatcherSession::Session session;
-	m_isInitialized = PatcherSession::tryLoadSession(&session);
+	PatcherCore::Session session;
+	m_isInitialized = PatcherCore::tryLoadSession(&session);
 
 	if (m_isInitialized) {
-		m_patcher = new Patcher(session);
+		m_patcher = new PatcherCore::Patcher(session);
 	}
 
 	LOG_APPEND("AFTER YAML");
