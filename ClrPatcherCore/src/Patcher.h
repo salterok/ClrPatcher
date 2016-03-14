@@ -1,18 +1,20 @@
 #pragma once
 #include "ProfilerDTOTypes.h"
-#include "PatcherSession.h"
 #include "PatcherApi.h"
 
-
 namespace PatcherCore {
-	class Patcher
+	struct Session;
+
+	class Patcher : public PatcherApi
 	{
 	public:
-		Patcher(Session session);
+		Patcher(Session *session);
 		~Patcher();
 
+		bool Patch();
+
 	private:
-		Session m_session;
+		Session *m_session;
 
 	};
 }

@@ -1,9 +1,13 @@
 #include "stdafx.h"
 #include "SessionTypes.h"
+#include "PatcherApi.h"
 
 namespace PatcherCore {
-	HRESULT ReplaceMethodRVACommand::run(PatcherApi & patcher)
+	void ReplaceMethodRVACommand::run(PatcherApi & patcher)
 	{
-		return E_NOTIMPL;
+		
+		patcher.replaceMethodRVA(Target, Source);
+
+		
 	}
 }

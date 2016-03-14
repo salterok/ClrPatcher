@@ -29,11 +29,7 @@ extern const GUID __declspec(selectany) CLSID_PROFILER = {
 #define BUFSIZE 2048
 
 extern std::wofstream g_wLogFile;
-
-extern WCHAR g_wszCmdFilePath[];
-extern WCHAR g_wszResponseFilePath[];
 extern WCHAR g_wszLogFilePath[];
-extern WCHAR g_wszResultFilePath[];
 
 
 // Implementation of the ICorProfilerCallback5 profiler API
@@ -198,8 +194,7 @@ private:
 	void AddHelperMethodDefs(IMetaDataImport * pImport, IMetaDataEmit * pEmit);
 	BOOL FindMscorlibReference(IMetaDataAssemblyImport * pAssemblyImport, mdAssemblyRef * rgAssemblyRefs, ULONG cAssemblyRefs, mdAssemblyRef * parMscorlib);
 
-	// Pipe operations with the GUI
-	void LaunchLogListener(LPCWSTR wszPath);
+
 	std::vector<ShadowStackFrameInfo> * GetShadowStack();
 	void GetClassAndFunctionNamesFromMethodDef(IMetaDataImport * pImport, ModuleID moduleID, mdMethodDef methodDef, LPWSTR wszTypeDefName, ULONG cchTypeDefName, LPWSTR wszMethodDefName, ULONG cchMethodDefName);
 

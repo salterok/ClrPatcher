@@ -174,12 +174,3 @@ struct ShadowStackFrameInfo
 	int m_nVersion;
 	ULONGLONG m_ui64TickCountOnEntry;
 };
-
-// Struct used to hold the arguments for creating the file watcher thread. 
-// Used since threadstart uses a LPVOID parameter for the called function.
-struct threadargs
-{
-	ICorProfilerCallback * m_pCallback;
-	LPCWSTR m_wszpath;
-	IDToInfoMap<ModuleID, ModuleInfo> * m_iMap;
-};

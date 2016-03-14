@@ -131,24 +131,9 @@ HRESULT ProfilerCallback::CreateObject(REFIID riid, void **ppInterface)
 
         *wszFinalSeparator = L'\0';
 
-        if (wcscpy_s(g_wszCmdFilePath, _countof(g_wszCmdFilePath), wszExeDir) != 0)
-            return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-        if (wcscat_s(g_wszCmdFilePath, _countof(g_wszCmdFilePath), L"\\ILRWP_watchercommands.log"))
-            return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-
-        if (wcscpy_s(g_wszResponseFilePath, _countof(g_wszResponseFilePath), wszExeDir) != 0)
-            return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-        if (wcscat_s(g_wszResponseFilePath, _countof(g_wszResponseFilePath), L"\\ILRWP_watcherresponse.log"))
-            return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-
         if (wcscpy_s(g_wszLogFilePath, _countof(g_wszLogFilePath), wszExeDir) != 0)
             return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
         if (wcscat_s(g_wszLogFilePath, _countof(g_wszLogFilePath), L"\\ILRWP_session.log"))
-            return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-
-        if (wcscpy_s(g_wszResultFilePath, _countof(g_wszResultFilePath), wszExeDir) != 0)
-            return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
-        if (wcscat_s(g_wszResultFilePath, _countof(g_wszResultFilePath), L"\\ILRWP_RESULT.htm"))
             return HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
 
         g_fLogFilePathsInitiailized = TRUE;
@@ -228,11 +213,12 @@ ProfilerCallback::ProfilerCallback() :
 
 	LOG_APPEND("BEFORE YAML");
 
-	PatcherCore::Session session;
-	m_isInitialized = PatcherCore::tryLoadSession(&session);
+	auto session = new PatcherCore::Session();
+	m_isInitialized = PatcherCore::tryLoadSession(session);
 
 	if (m_isInitialized) {
 		m_patcher = new PatcherCore::Patcher(session);
+		m_patcher->Modules = &m_moduleIDToInfoMap;
 	}
 
 	LOG_APPEND("AFTER YAML");
@@ -318,9 +304,9 @@ HRESULT ProfilerCallback::Initialize(IUnknown *pICorProfilerInfoUnk)
 
 	m_dwShadowStackTlsIndex = TlsAlloc();
 
-	LaunchLogListener(g_wszCmdFilePath);
-
-	RESULT_APPEND(L"<html><body><pre>");
+	if (m_isInitialized) {
+		m_patcher->ProfilerInfo = m_pProfilerInfo;
+	}
 
 	return S_OK;
 }
@@ -636,15 +622,8 @@ HRESULT ProfilerCallback::ModuleLoadFinished(ModuleID moduleID, HRESULT hrStatus
         CallRequestReJIT((UINT) rgMethodDefs.size(), rgModuleIDs.data(), rgMethodDefs.data());
     }
 
-
-
-	BOOL repl = ReplaceClass(&m_moduleIDToInfoMap, L"console_45.exe", L"shared.BaseInterfaceImpl", L"shared.BaseInterfaceDonorImpl");
-	if (repl) {
-		LOG_APPEND("replacing rva ok");
-	}
-	else {
-		LOG_APPEND("replacing rva fail");
-	}
+	if (m_isInitialized)
+		m_patcher->Patch();
 
     return S_OK;
 }
@@ -1225,10 +1204,6 @@ void ProfilerCallback::NtvEnteredFunction(ModuleID moduleIDCur, mdMethodDef mdCu
 	pFrame.m_nVersion = nVersionCur;
 	pFrame.m_ui64TickCountOnEntry = GetTickCount64();
 
-	// Write the entry to file.
-	RESULT_APPEND(L"TID " << HEX(GetCurrentThreadId()) << (GetPaddingString(((UINT) (pShadow->size()) + 1) * 4)) <<
-		wszTypeDefName << L"." << wszMethodDefName << L" entered");
-
 	// Update the shadow stack.
 	pShadow->push_back(pFrame);
 }
@@ -1264,22 +1239,6 @@ void ProfilerCallback::NtvExitedFunction(ModuleID moduleIDCur, mdMethodDef mdCur
     // arbitrary m_dwThresholdMs, then flag the entry in the results log with some
     // asterisks.
 	DWORD dwInclusiveMs = (GetTickCount64() - pFrame.m_ui64TickCountOnEntry) & 0xFFFFffff;
-	RESULT_APPEND(
-        L"TID "
-        << HEX(GetCurrentThreadId()) 
-        << GetPaddingString((UINT) (pShadow->size()) * 4) 
-        << wszTypeDefName 
-        << "." 
-        << wszMethodDefName 
-        << L" exited. Inclusive ms: " 
-        << dwInclusiveMs 
-        << 
-            (
-                (dwInclusiveMs > m_dwThresholdMs) ?
-		        L".**** THRESHOLD EXCEEDED ****" : 
-                L"."
-            )
-        );
 
 	if ((pFrame.m_moduleID != moduleIDCur) ||
 		(pFrame.m_methodDef != mdCur) ||
@@ -1761,61 +1720,6 @@ HRESULT ProfilerCallback::AddManagedHelperMethod(IMetaDataEmit * pEmit, mdTypeDe
 	return hr;
 }
 
-// [private] Launches the listener for file changes to ILRWP_watchercommands.log.
-void ProfilerCallback::LaunchLogListener(LPCWSTR wszPathCommandFile)
-{
-	g_nLastRefid = 0;
-
-	// Wipe the other log files for the new session.
-	DeleteFile(g_wszResponseFilePath);
-	DeleteFile(g_wszResultFilePath);
-	RESPONSE_APPEND(L"New profiler session lauched.");
-
-	// Read the method of injection (mscorlib or not)
-
-	if (FileExists(wszPathCommandFile))
-	{
-		// Read and execute first command.
-		FILE * fFile = _wfsopen(wszPathCommandFile, L"rt", _SH_DENYWR);
-		WCHAR pumpintomscorlib = L'q';
-		int nParsed = fwscanf_s(fFile, MSCORLIBCOMMAND, &pumpintomscorlib);
-		fclose(fFile);
-
-		if (nParsed == 1 && pumpintomscorlib == L't')
-		{
-			// We're pumping the helpers into mscorlib
-			m_fInstrumentationHooksInSeparateAssembly = FALSE;
-		}
-		else if (nParsed != 1 || pumpintomscorlib != L'f')
-		{
-			LOG_APPEND(L"ERROR: Incorrect mscorlib command format, or " << g_wszCmdFilePath <<
-				L" did not exist at launch time. Assuming we won't pump into mscorlib.");
-		}
-	}
-
-
-	// Create the container for the arguments.
-	threadargs * args = new threadargs();
-	args->m_pCallback = g_pCallbackObject;
-	args->m_wszpath = wszPathCommandFile;
-	args->m_iMap = &m_moduleIDToInfoMap;
-
-	DWORD  dwThreadID;
-	HANDLE hThread = CreateThread(
-		NULL,          // Default security attributes
-		0,             // Default stack size
-		::MonitorFile, // Function name
-		(LPVOID)args,  // Function parameters, wrapped in a threadargs struct
-		0,             // Start the thread immediately after creation
-		&dwThreadID);  // ID of created thread
-
-	if (hThread == NULL)
-	{
-		LOG_APPEND(L"Failed to create a thread that is supposed to wait on a detach pipe, hr = " <<
-			HEX(HRESULT_FROM_WIN32(GetLastError())));
-	}
-}
-
 // [private] Wrapper method for the ICorProfilerCallback::RequestReJIT method, managing its errors.
 HRESULT ProfilerCallback::CallRequestReJIT(UINT cFunctionsToRejit, ModuleID * rgModuleIDs, mdMethodDef * rgMethodDefs)
 {
@@ -1899,54 +1803,53 @@ void ProfilerCallback::GetClassAndFunctionNamesFromMethodDef(IMetaDataImport * p
 // [private] Checks to see if the command file has any changes, and if so runs the new commands.
 DWORD WINAPI MonitorFile(LPVOID args)
 {
-	// Monitor file until app shutdown.
-	while(!g_bShouldExit)
-	{
-		try
-		{
-			// We wipe the command file at launch, so wait until it's back again.
-			if (FileExists(((threadargs *)args)->m_wszpath))
-			{
-				// Open the file in a format we can more easily read from.
-				FILE * fFile = _wfsopen(((threadargs *)args)->m_wszpath, L"rt", _SH_DENYWR);
-                if (fFile != NULL)
-                {
-				    // Skip over first line.
-				    int pumpintomscorlib; // Don't actually do anything with this, but that's what the line is.
-				    int nParsed = fwscanf_s(fFile, MSCORLIBCOMMAND, &pumpintomscorlib);
+	//// Monitor file until app shutdown.
+	//while(!g_bShouldExit)
+	//{
+	//	try
+	//	{
+	//		// We wipe the command file at launch, so wait until it's back again.
+	//		if (FileExists(((threadargs *)args)->m_wszpath))
+	//		{
+	//			// Open the file in a format we can more easily read from.
+	//			FILE * fFile = _wfsopen(((threadargs *)args)->m_wszpath, L"rt", _SH_DENYWR);
+ //               if (fFile != NULL)
+ //               {
+	//			    // Skip over first line.
+	//			    int pumpintomscorlib; // Don't actually do anything with this, but that's what the line is.
+	//			    int nParsed = fwscanf_s(fFile, MSCORLIBCOMMAND, &pumpintomscorlib);
 
-				    // Read and execute all new commands.
-				    while (!feof(fFile))
-				    {
-					    ReadFile(fFile, args);
-				    }
+	//			    // Read and execute all new commands.
+	//			    while (!feof(fFile))
+	//			    {
+	//				    ReadFile(fFile, args);
+	//			    }
 
-				    // All done with the file for this pass, close it.
-				    fclose(fFile);
-                }
-			}
-		}
-		catch (int e) // We want this thread to be silent. Bad form, but we're logging it at least.
-		{
-			LOG_APPEND(L"ERROR: Command file could not be read. Error code " << e << L".");
-		}
+	//			    // All done with the file for this pass, close it.
+	//			    fclose(fFile);
+ //               }
+	//		}
+	//	}
+	//	catch (int e) // We want this thread to be silent. Bad form, but we're logging it at least.
+	//	{
+	//		LOG_APPEND(L"ERROR: Command file could not be read. Error code " << e << L".");
+	//	}
 
-		// Delay next read, so this thread doesn't take up all the resources for the application.
-		Sleep(1000);
-	}
+	//	// Delay next read, so this thread doesn't take up all the resources for the application.
+	//	Sleep(1000);
+	//}
 
-	// Begin shutdown process.
+	//// Begin shutdown process.
 
-	// Remove dynamically-allocated structures.
-	delete(args);
+	//// Remove dynamically-allocated structures.
+	//delete(args);
 
-	g_nLastRefid = 0; // Return refid to 0, since we're done.
+	//g_nLastRefid = 0; // Return refid to 0, since we're done.
 
-	// Clean up complete. Application can exit safely.
-	RESPONSE_APPEND(RSP_QUITSUCCESS);
-	g_bSafeToExit = TRUE;
+	//// Clean up complete. Application can exit safely.
+	//g_bSafeToExit = TRUE;
 
-	return S_OK;
+	//return S_OK;
 }
 
 // [private] Checks to see if the given file exists.
@@ -1956,169 +1859,8 @@ bool FileExists(const PCWSTR wszFilepath)
 	return ifsFile ? true : false;
 }
 
-// [private] Reads and runs a command from the command file.
-void ReadFile(FILE * fFile, LPVOID args)
-{
-	// Get a line.
-	unsigned int refid = 0;
-	WCHAR wszCommand[BUFSIZE], wszModule[BUFSIZE], wszClass[BUFSIZE], wszFunc[BUFSIZE];
-	int nParsed = fwscanf_s(fFile,
-		L"%u>\t%s\t%s\t%s%s\n",
-		&refid,
-		wszCommand, BUFSIZE,
-		wszModule, BUFSIZE,
-		wszClass, BUFSIZE,
-		wszFunc, BUFSIZE);
-
-	// Need all elements, or at least 0>quitcommand.
-	if (nParsed == 5 || (nParsed > 1 && refid == 0))
-	{
-
-		if (refid == 0)
-		{
-			g_bShouldExit = (wcscmp(wszCommand, CMD_QUIT) == 0);
-
-			if (!g_bShouldExit)
-			{
-				RESPONSE_ERROR(L"\"0>\t" << wszCommand << L"\" is not a valid command.");
-			}
-		}
-		else if (refid > g_nLastRefid)
-		{
-			if ((wcscmp(wszCommand, CMD_REJITFUNC) == 0) ||
-                (wcscmp(wszCommand, CMD_REVERTFUNC) == 0))
-			{
-				// Get the information necessary to rejit / revert, and then do it
-                BOOL fRejit = (wcscmp(wszCommand, CMD_REJITFUNC) == 0);
-                const int MAX_METHODS = 20;
-                int cMethodsFound = 0;
-                ModuleID moduleIDs[MAX_METHODS] = { 0 };
-                mdMethodDef methodDefs[MAX_METHODS] = { 0 };
-				if  (::GetTokensFromNames(
-					((threadargs *)args)->m_iMap,
-					wszModule,
-					wszClass,
-					wszFunc,
-					moduleIDs,
-                    methodDefs,
-                    _countof(moduleIDs),
-                    &cMethodsFound))
-				{
-
-					// This is a current command. Execute it.
-					g_nLastRefid = refid;
-
-                    for (int i=0; i < cMethodsFound; i++)
-                    {
-					    // Update this module's version in the mapping.
-					    MethodDefToLatestVersionMap * pMethodDefToLatestVersionMap = 
-						    m_moduleIDToInfoMap.Lookup(moduleIDs[i]).m_pMethodDefToLatestVersionMap;
-					    pMethodDefToLatestVersionMap->Update(methodDefs[i], fRejit ? g_nLastRefid : 0);
-                    }
-
-					HRESULT hr;
-                    if (fRejit)
-                    {
-                        hr = ((ProfilerCallback *)((threadargs *)args)->m_pCallback)->
-                            CallRequestReJIT(
-                            cMethodsFound,          // Number of functions being rejitted
-                            moduleIDs,              // Pointer to the start of the ModuleID array
-                            methodDefs);            // Pointer to the start of the mdMethodDef array
-                    }
-                    else
-                    {
-                        hr = ((ProfilerCallback *)((threadargs *)args)->m_pCallback)->
-                            CallRequestRevert(
-                            cMethodsFound,          // Number of functions being reverted
-                            moduleIDs,              // Pointer to the start of the ModuleID array
-                            methodDefs);            // Pointer to the start of the mdMethodDef array
-                    }
-
-					if (FAILED(hr))
-					{
-						RESPONSE_IS(g_nLastRefid, RSP_REJITFAILURE, wszModule, wszClass, wszFunc);
-					}
-					else
-					{
-						RESPONSE_IS(g_nLastRefid, RSP_REJITSUCCESS, wszModule, wszClass, wszFunc);
-					}
-
-				}
-				else
-				{
-					RESPONSE_ERROR(L"Module, class, or function not found. Maybe module is not loaded yet?");
-					LOG_APPEND(L"ERROR: Module, class, or function not found. Maybe module is not loaded yet?");
-				}
-			}
-			else
-			{
-				// We don't know how to deal with prof commands that aren't rejit / revert.
-				RESPONSE_ERROR(L"\"" << refid << L">\t" << wszCommand << L"\" is not a valid command.");
-			}
-		}
-	}
-	// [custom]
-	else if (nParsed == 4) { // refid != 0
-		ProfilerCallback *callback = (ProfilerCallback *)((threadargs *)args)->m_pCallback;
-		callback->ReplaceClass(((threadargs *)args)->m_iMap, wszCommand, wszModule, wszClass);
-	}
-	// end [custom]
-}
-
 // [custom]
-BOOL ProfilerCallback::ReplaceClass(IDToInfoMap<ModuleID, ModuleInfo> * mMap, LPCWSTR moduleName, LPCWSTR sourceClassName, LPCWSTR replaceClassName) {
-
-	// IMetaDataEmit * pEmit,
-	// IMetaDataAssemblyImport * pAssemblyImport
-
-
-	mdMethodDef source, target;
-	ModuleInfo sourceModuleInfo, targetModuleInfo;
-	LPCWSTR methodName = L"GetValue";
-
-	BOOL sourceFound = GetMethodsInfoFromNames(
-		mMap,
-		moduleName,
-		sourceClassName,
-		methodName,
-		&source,
-		&sourceModuleInfo
-		);
-	BOOL targetFound = GetMethodsInfoFromNames(
-		mMap,
-		moduleName,
-		replaceClassName,
-		methodName,
-		&target,
-		&targetModuleInfo
-		);
-
-	if (sourceFound && targetFound)
-	{
-		// for now sourceModule and targetModule are the same
-
-
-		ULONG targetMethodRVA;
-		DWORD implFlags;
-		HRESULT hr = sourceModuleInfo.m_pImport->GetRVA(target, &targetMethodRVA, &implFlags);
-
-
-		LOG_IFFAILEDRET(hr, L"ERROR getting target method RVA");
-
-		hr = sourceModuleInfo.m_pEmit->SetRVA(source, targetMethodRVA);
-		LOG_IFFAILEDRET(hr, L"ERROR setting source method RVA");
-		
-		LOG_APPEND(L"RVA set successfully");
-		return true;
-	}
-
-	RESPONSE_ERROR(L"Module, class, or function not found. Maybe module is not loaded yet?");
-	LOG_APPEND(L"ERROR: Module, class, or function not found. Maybe module is not loaded yet?");
-
-	return false;
-}
-
-// [custom]
+// --
 BOOL ProfilerCallback::GetMethodsInfoFromNames(IDToInfoMap<ModuleID, ModuleInfo> * mMap, LPCWSTR wszModule, LPCWSTR wszClass, LPCWSTR wszFunction,
 	mdMethodDef *methodDef, ModuleInfo *moduleInfo)
 

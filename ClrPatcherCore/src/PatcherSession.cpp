@@ -19,7 +19,7 @@ namespace PatcherCore {
 		auto doc = docs[0];
 
 		if (!doc.IsMap())
-			throw new exception("Patcher commands should contain only documents of map");
+			throw exception("Patcher commands should contain only documents of map");
 
 		return doc.as<Session>();
 
@@ -62,16 +62,14 @@ namespace PatcherCore {
 				// m_isInitialized stay false
 			}
 		}
-		catch (YAML::Exception ex) {
+		catch (YAML::Exception &ex) {
 			LOG_APPEND(ex.what() << " | " << ex.msg.c_str());
 		}
 		catch (std::exception &ex) {
 			LOG_APPEND(ex.what());
 			// TODO: add logs
 		}
-		catch (...) {
-			LOG_APPEND("EX");
-		}
+
 		return false;
 	}
 
