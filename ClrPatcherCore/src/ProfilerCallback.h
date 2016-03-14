@@ -222,7 +222,7 @@ private:
 
 
 
-	ICorProfilerInfo4 * m_pProfilerInfo;
+	ICorProfilerInfo2 * m_pProfilerInfo;
 
 	volatile long m_refCount;
 	ModuleID m_modidMscorlib;

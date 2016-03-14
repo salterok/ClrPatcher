@@ -20,19 +20,19 @@ namespace CLRPatcher.Test
 
         public SampleTestResult RunTest(string testName, int customTimeLimit = WaitForExit)
         {
-            return Run(testName, false, customTimeLimit);
+            return Run(testName, null, customTimeLimit);
         }
 
-        public SampleTestResult RunPatchedTest(string testName, int customTimeLimit = WaitForExit)
+        public SampleTestResult RunPatchedTest(string testName, string command, int customTimeLimit = WaitForExit)
         {
-            return Run(testName, true, customTimeLimit);
+            return Run(testName, command, customTimeLimit);
         }
 
-        private SampleTestResult Run(string testName, bool patched, int customTimeLimit = WaitForExit)
+        private SampleTestResult Run(string testName, string command, int customTimeLimit = WaitForExit)
         {
             try
             {
-                var result = RunForResult(testName, patched, customTimeLimit);
+                var result = RunForResult(testName, command, customTimeLimit);
                 var testResult = SampleTestResult.TryCreateFromString(result);
                 if (testResult.HasValue)
                 {
@@ -57,18 +57,20 @@ namespace CLRPatcher.Test
             }
         }
 
-        private string RunForResult(string testName, bool patched, int customTimeLimit)
+        private string RunForResult(string testName, string command, int customTimeLimit)
         {
-            var args = patched ? $"{testName} --patched" : testName;
+            var args = command == null ? testName : $"{testName} --patched";
             var processStartInfo = new ProcessStartInfo(TargetName, args);
             processStartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             processStartInfo.CreateNoWindow = true;
             processStartInfo.UseShellExecute = false;
             processStartInfo.RedirectStandardOutput = true;
-            if (patched)
+            if (command != null)
             {
                 processStartInfo.EnvironmentVariables.Add("COR_ENABLE_PROFILING", "1");
                 processStartInfo.EnvironmentVariables.Add("COR_PROFILER", Settings.Default.PatcherGUID);
+                processStartInfo.EnvironmentVariables.Add("PATCHER_COMMAND", command);
+
             }
             using (var process = new Process())
             {

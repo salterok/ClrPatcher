@@ -7,7 +7,7 @@ namespace PatcherCore {
 	class PatcherApi {
 
 	public:
-		ICorProfilerInfo4 *ProfilerInfo;
+		ICorProfilerInfo2 *ProfilerInfo;
 		IDToInfoMap<ModuleID, ModuleInfo> * Modules;
 
 	

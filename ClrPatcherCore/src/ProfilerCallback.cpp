@@ -285,7 +285,7 @@ HRESULT ProfilerCallback::Initialize(IUnknown *pICorProfilerInfoUnk)
 	HRESULT hr;
 
 	// Even though there are 5 different ICorProfiler Callbacks, there are presently only 4 Infos
-	hr = pICorProfilerInfoUnk->QueryInterface(IID_ICorProfilerInfo4, (void **)&m_pProfilerInfo);
+	hr = pICorProfilerInfoUnk->QueryInterface(IID_ICorProfilerInfo2, (void **)&m_pProfilerInfo);
 	if (FAILED(hr))
 	{
 		LOG_IFFAILEDRET(hr, L"QueryInterface for ICorProfilerInfo4 failed in ::Initialize");
@@ -396,23 +396,31 @@ HRESULT ProfilerCallback::ModuleLoadFinished(ModuleID moduleID, HRESULT hrStatus
 	AssemblyID assemblyID;
 	DWORD dwModuleFlags;
 
-	HRESULT hr = m_pProfilerInfo->GetModuleInfo2(
+	//HRESULT hr = m_pProfilerInfo->GetModuleInfo2(
+	//	moduleID,
+	//	&pbBaseLoadAddr,
+	//	cchNameIn,
+	//	&cchNameOut,
+	//	wszName,
+	//	&assemblyID,
+	//	&dwModuleFlags);
+
+	HRESULT hr = m_pProfilerInfo->GetModuleInfo(
 		moduleID,
 		&pbBaseLoadAddr,
 		cchNameIn,
 		&cchNameOut,
 		wszName,
-		&assemblyID,
-		&dwModuleFlags);
+		&assemblyID);
 
 	LOG_IFFAILEDRET(hr, L"GetModuleInfo2 failed for ModuleID = " << HEX(moduleID));
 
-    if ((dwModuleFlags & COR_PRF_MODULE_WINDOWS_RUNTIME) != 0)
-    {
-        // Ignore any Windows Runtime modules.  We cannot obtain writeable metadata
-        // interfaces on them or instrument their IL
-        return S_OK;
-    }
+    //if ((dwModuleFlags & COR_PRF_MODULE_WINDOWS_RUNTIME) != 0)
+    //{
+    //    // Ignore any Windows Runtime modules.  We cannot obtain writeable metadata
+    //    // interfaces on them or instrument their IL
+    //    return S_OK;
+    //}
 
 	AppDomainID appDomainID;
 	ModuleID modIDDummy;
@@ -453,6 +461,11 @@ HRESULT ProfilerCallback::ModuleLoadFinished(ModuleID moduleID, HRESULT hrStatus
             fPumpHelperMethodsIntoThisModule = TRUE;
         }
     }
+
+	// skip if NLP-file loaded 
+	// probably NLP is binary custom culture file
+	if (::ContainsAtEnd(wszName, L".nlp")) 
+		return S_OK;
 
     // Grab metadata interfaces 
 
@@ -1723,24 +1736,26 @@ HRESULT ProfilerCallback::AddManagedHelperMethod(IMetaDataEmit * pEmit, mdTypeDe
 // [private] Wrapper method for the ICorProfilerCallback::RequestReJIT method, managing its errors.
 HRESULT ProfilerCallback::CallRequestReJIT(UINT cFunctionsToRejit, ModuleID * rgModuleIDs, mdMethodDef * rgMethodDefs)
 {
-	HRESULT hr = m_pProfilerInfo->RequestReJIT(cFunctionsToRejit, rgModuleIDs, rgMethodDefs);
+	//HRESULT hr = m_pProfilerInfo->RequestReJIT(cFunctionsToRejit, rgModuleIDs, rgMethodDefs);
 
-	LOG_IFFAILEDRET(hr, L"RequestReJIT failed");
+	//LOG_IFFAILEDRET(hr, L"RequestReJIT failed");
 
-	LOG_APPEND(L"RequestReJIT successfully called with " << cFunctionsToRejit << L" methods.");
-	return hr;
+	//LOG_APPEND(L"RequestReJIT successfully called with " << cFunctionsToRejit << L" methods.");
+	//return hr;
+	return E_NOTIMPL;
 }
 
 // [private] Wrapper method for the ICorProfilerCallback::RequestRevert method, managing its errors.
 HRESULT ProfilerCallback::CallRequestRevert(UINT cFunctionsToRejit, ModuleID * rgModuleIDs, mdMethodDef * rgMethodDefs)
 {
-	HRESULT results[10];
-	HRESULT hr = m_pProfilerInfo->RequestRevert(cFunctionsToRejit, rgModuleIDs, rgMethodDefs, results);
+	//HRESULT results[10];
+	//HRESULT hr = m_pProfilerInfo->RequestRevert(cFunctionsToRejit, rgModuleIDs, rgMethodDefs, results);
 
-	LOG_IFFAILEDRET(hr, L"RequestRevert failed");
+	//LOG_IFFAILEDRET(hr, L"RequestRevert failed");
 
-	LOG_APPEND(L"RequestRevert successfully called with " << cFunctionsToRejit << L" methods.");
-	return hr;
+	//LOG_APPEND(L"RequestRevert successfully called with " << cFunctionsToRejit << L" methods.");
+	//return hr;
+	return E_NOTIMPL;
 }
 
 // [private] Gets the shadow stack for the thread.

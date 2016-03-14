@@ -22,7 +22,19 @@ namespace CLRPatcher.Test.SampleTests
         [TestMethod]
         public void BasicInterface_GetValue_Patched()
         {
-            var result = pog.RunPatchedTest("BaseInterface.GetValue");
+            var command = $@"
+options:
+commands:
+    - ReplaceMethodRVACommand:
+        TargetModule: {TargetName}
+        TargetType: shared.BaseInterfaceImpl
+        TargetMember: GetValue
+
+        SourceModule: {TargetName}
+        SourceType: shared.BaseInterfaceDonorImpl
+        SourceMember: GetValue
+";
+            var result = pog.RunPatchedTest("BaseInterface.GetValue", command);
             HandleResult(result);
         }
 
