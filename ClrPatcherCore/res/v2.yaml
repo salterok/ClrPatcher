@@ -1,0 +1,22 @@
+%YAML 1.2
+
+version: 2
+options:
+    sources:
+        f1: file1
+        f2: file2
+        f3: file3
+
+commands: # is seq of 'blocks' where block is a sequence of commands should be executed in current context
+    - !block f1: # means 'use source file f1 in this block by default'
+        - 
+    - !block f2
+commands:
+    - command1:
+        param1: 1
+        param2: ""
+    - command2:
+        param1: ""
+        param2: 3
+        param3: 31
+    - command3:

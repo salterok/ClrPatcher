@@ -464,6 +464,7 @@ HRESULT ProfilerCallback::ModuleLoadFinished(ModuleID moduleID, HRESULT hrStatus
 
 	// skip if NLP-file loaded 
 	// probably NLP is binary custom culture file
+	// Only fires on net 2.0 by now
 	if (::ContainsAtEnd(wszName, L".nlp")) 
 		return S_OK;
 

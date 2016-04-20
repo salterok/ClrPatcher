@@ -1,0 +1,14 @@
+%YAML 1.2
+
+version: 1
+options:
+
+commands:
+    - command1:
+        param1: 1
+        param2: ""
+    - command2:
+        param1: ""
+        param2: 3
+        param3: 31
+    - command3:

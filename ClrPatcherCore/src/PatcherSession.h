@@ -17,6 +17,7 @@ namespace PatcherCore {
 
 	struct Session
 	{
+		int version;
 		Options options;
 		Commands commands;
 	};
@@ -24,6 +25,7 @@ namespace PatcherCore {
 	enum SectionType
 	{
 		UNKNOWN,
+		VERSION,
 		OPTIONS,
 		COMMANDS
 	};

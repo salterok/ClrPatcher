@@ -21,9 +21,27 @@ namespace PatcherCore {
 		if (!doc.IsMap())
 			throw exception("Patcher commands should contain only documents of map");
 
-		return doc.as<Session>();
+		auto version = doc["version"];
+		if (!version.IsDefined() || !version.IsScalar()) {
+			throw exception("Session file must contain valid 'version'.");
+		}
+		int versionVal = version.as<int>();
+		switch (versionVal) {
+		case 1:
+			return _parseV1(doc);
+		case 2:
+			return _parseV2(doc);
+		default:
+			throw exception("Unsupported session definition version");
+		}
+	}
 
-		//return Session();
+	Session _parseV1(Node &doc) {
+		return doc.as<Session>();
+	}
+
+	Session _parseV2(Node &doc) {
+		throw exception("Not implemented");
 	}
 
 	Session parseFromString(char *commands)
